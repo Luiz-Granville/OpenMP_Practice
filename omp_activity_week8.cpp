@@ -2,42 +2,67 @@
 #include <stdlib.h>
 #include <omp.h>
 
-#define N 6  // Tamanho do vetor
+#define N 200000000 // Tamanho do vetor
+
+// Função para inicializar o vetor com números aleatórios
+void initialize_vector(int *vector, int size) {
+    for (int i = 0; i < size; i++) {
+        vector[i] = rand() % 100; // Números aleatórios de 0 a 99
+    }
+}
+
+// Função para encontrar o maior número no vetor de forma serializada
+int serial_max(int *vector, int size) {
+    int max = vector[0];
+    for (int i = 1; i < size; i++) {
+        if (vector[i] > max) {
+            max = vector[i];
+        }
+    }
+    return max;
+}
 
 int main() {
-    int vetor[N] = {2, 8, 1, 4, 7, 3};
-    int num_threads = 4;
-    int max_values[num_threads];
-    
-    // Definir o número de threads
-    omp_set_num_threads(num_threads);
+    int *vector = (int *)malloc(N * sizeof(int));
 
-    #pragma omp parallel
-    {
-        int id = omp_get_thread_num();
-        int start = id * (N / num_threads);
-        int end = (id + 1) * (N / num_threads);
-        if (id == num_threads - 1) {
-            end = N;  // A última thread pode pegar o restante dos elementos
-        }
-        
-        int local_max = vetor[start];
-        for (int i = start + 1; i < end; i++) {
-            if (vetor[i] > local_max) {
-                local_max = vetor[i];
+    // Inicialização do vetor com números aleatórios
+    initialize_vector(vector, N);
+
+    FILE *fp = fopen("results/data_1.txt", "w"); // Abrir arquivo para escrever os resultados
+    if (fp == NULL) {
+        printf("Erro ao abrir arquivo para escrever os resultados.\n");
+        return 1;
+    }
+
+    // Versão serializada
+    double start_time = omp_get_wtime();
+    int max_serial = serial_max(vector, N);
+    double end_time = omp_get_wtime();
+    fprintf(fp, "1 %.5f\n", end_time - start_time);
+
+    // Versão paralela
+    for (int num_threads = 2; num_threads <= 16; num_threads *= 2) {
+        omp_set_num_threads(num_threads);
+        start_time = omp_get_wtime();
+        int max = vector[0];
+
+        // Paralelização do loop para encontrar o maior número
+        #pragma omp parallel for reduction(max:max)
+        for (int i = 1; i < N; i++) {
+            if (vector[i] > max) {
+                max = vector[i];
             }
         }
-        max_values[id] = local_max;
+
+        end_time = omp_get_wtime();
+        fprintf(fp, "%d %.5f\n", num_threads, end_time - start_time);
     }
 
-    // Encontrar o maior número entre os valores máximos parciais
-    int global_max = max_values[0];
-    for (int i = 1; i < num_threads; i++) {
-        if (max_values[i] > global_max) {
-            global_max = max_values[i];
-        }
-    }
+    fclose(fp);
+    free(vector);
 
-    printf("O maior número do vetor é: %d\n", global_max);
+    // Chamar o script Gnuplot para plotar o gráfico
+    system("gnuplot -persist results/plot_script_1.gnu");
+
     return 0;
 }

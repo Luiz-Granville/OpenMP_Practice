@@ -123,10 +123,10 @@ int main() {
 
 #### Resultados e Discussão:
 
-Os resultados dos tempos de execução para diferentes números de threads foram registrados no arquivo `results/data.txt`. Eles foram plotados em um gráfico para análise visual.
+Os resultados dos tempos de execução para diferentes números de threads foram registrados no arquivo `results/data_0.txt`. Eles foram plotados em um gráfico para análise visual.
 
 <p align="center">
-  <img src="results/plot.png" alt="Tempo de Execução Serial x Paralelo com Diferentes Números de Threads">
+  <img src="results/plot_0.png" alt="Tempo de Execução Serial x Paralelo com Diferentes Números de Threads">
 </p>
 
 A partir do gráfico acima, podemos observar o desempenho do algoritmo de soma serial em comparação com a versão paralela para diferentes números de threads.
@@ -172,10 +172,129 @@ Aqui está a tabela com os dados de tempo:
 </p>
 
 
-
 O OpenMP permite paralelizar o cálculo da soma dos elementos de um vetor de forma eficiente, resultando em uma melhoria significativa no desempenho em comparação com a versão serial. No entanto, é importante encontrar um equilíbrio ao escolher o número de threads para evitar sobrecarga e obter o máximo de desempenho possível.
+
+Com base na solicitação da atividade no Adalove seegue o [vídeo de execução e análise no youtube](www.google.com)
 
 ### omp_activity_week8.cpp (Semana 8)
 
-Atividade sendo desenvolvida...
+Na atividade da Semana 8, implementamos um programa em C que procura o maior elemento de um vetor usando o OpenMP. O código paraleliza a busca usando diretivas OpenMP, permitindo que o processamento seja distribuído entre várias threads.
+
+```c
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
+
+#define N 200000000 // Tamanho do vetor
+
+// Função para inicializar o vetor com números aleatórios
+void initialize_vector(int *vector, int size) {
+    for (int i = 0; i < size; i++) {
+        vector[i] = rand() % 100; // Números aleatórios de 0 a 99
+    }
+}
+
+// Função para encontrar o maior número no vetor de forma serializada
+int serial_max(int *vector, int size) {
+    int max = vector[0];
+    for (int i = 1; i < size; i++) {
+        if (vector[i] > max) {
+            max = vector[i];
+        }
+    }
+    return max;
+}
+
+int main() {
+    int *vector = (int *)malloc(N * sizeof(int));
+
+    // Inicialização do vetor com números aleatórios
+    initialize_vector(vector, N);
+
+    FILE *fp = fopen("results/data_1.txt", "w"); // Abrir arquivo para escrever os resultados
+    if (fp == NULL) {
+        printf("Erro ao abrir arquivo para escrever os resultados.\n");
+        return 1;
+    }
+
+    // Versão serializada
+    double start_time = omp_get_wtime();
+    int max_serial = serial_max(vector, N);
+    double end_time = omp_get_wtime();
+    fprintf(fp, "1 %.5f\n", end_time - start_time);
+
+    // Versão paralela
+    for (int num_threads = 2; num_threads <= 16; num_threads *= 2) {
+        omp_set_num_threads(num_threads);
+        start_time = omp_get_wtime();
+        int max = vector[0];
+
+        // Paralelização do loop para encontrar o maior número
+        #pragma omp parallel for reduction(max:max)
+        for (int i = 1; i < N; i++) {
+            if (vector[i] > max) {
+                max = vector[i];
+            }
+        }
+
+        end_time = omp_get_wtime();
+        fprintf(fp, "%d %.5f\n", num_threads, end_time - start_time);
+    }
+
+    fclose(fp);
+    free(vector);
+
+    // Chamar o script Gnuplot para plotar o gráfico
+    system("gnuplot -persist results/plot_script_1.gnu");
+
+    return 0;
+}
+```
+
+#### Resultados e Discussão:
+
+Os resultados dos tempos de execução para diferentes números de threads foram registrados no arquivo `results/data_1.txt`. Eles foram plotados em um gráfico para análise visual.
+
+<p align="center">
+  <img src="results/plot_1.png" alt="Tempo de Execução Serial x Paralelo com Diferentes Números de Threads">
+</p>
+
+A partir do gráfico acima, podemos observar o desempenho do algoritmo de soma serial em comparação com a versão paralela para diferentes números de threads.
+
+- Quando utilizamos apenas uma thread (serial), o tempo de execução é mais longo, indicando que a computação ocorre de forma sequencial e, portanto, mais lenta.
+- Conforme aumentamos o número de threads na versão paralela, o tempo de execução diminui significativamente. Isso ocorre porque mais threads estão disponíveis para processar o trabalho em paralelo, resultando em uma execução mais rápida.
+- No entanto, após um certo ponto, adicionar mais threads não oferece benefícios adicionais de desempenho. No gráfico, observamos que o tempo de execução diminui rapidamente com o aumento do número de threads até cerca de 8 threads. Depois disso, as melhorias no tempo de execução se tornam menos significativas à medida que mais threads são adicionadas.
+
+Aqui está a tabela com os dados de tempo:
+
+<table align="center">
+    <tr>
+    <th>Número de Threads</th>
+    <th>Tempo (s)</th>
+    </tr>
+    <tr align="center">
+    <td>1</td>
+    <td>0.54823</td>
+    </tr>
+    <tr align="center">
+    <td>2</td>
+    <td>0.23245</td>
+    </tr>
+    <tr align="center">
+    <td>4</td>
+    <td>0.10881</td>
+    </tr>
+    <tr align="center">
+    <td>8</td>
+    <td>0.06046</td>
+    </tr>
+    <tr align="center">
+    <td>16</td>
+    <td>0.04566</td>
+    </tr>
+</table>
+
+O OpenMP permite paralelizar a busca de elementos de um vetor de forma eficiente, resultando em uma melhoria significativa no desempenho em comparação com a versão serial. No entanto, é importante encontrar um equilíbrio ao escolher o número de threads para evitar sobrecarga e obter o máximo de desempenho possível.
+
+Com base na solicitação da atividade no Adalove seegue o [vídeo de execução e análise no youtube](www.google.com)
 

@@ -1,2 +1,2 @@
 *.log
-programa_seu.dSYM/
+*dSYM/

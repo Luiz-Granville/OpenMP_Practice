@@ -26,7 +26,7 @@ int main() {
     // Inicialização do vetor com números aleatórios
     initialize_vector(vector, N);
 
-    FILE *fp = fopen("results/data.txt", "w"); // Abrir arquivo para escrever os resultados
+    FILE *fp = fopen("results/data_0.txt", "w"); // Abrir arquivo para escrever os resultados
     if (fp == NULL) {
         printf("Erro ao abrir arquivo para escrever os resultados.\n");
         return 1;
@@ -58,7 +58,7 @@ int main() {
     free(vector);
 
     // Chamar o script Gnuplot para plotar o gráfico
-    system("gnuplot -persist results/plot_script.gnu");
+    system("gnuplot -persist results/plot_script_0.gnu");
 
     return 0;
 }
