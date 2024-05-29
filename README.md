@@ -174,7 +174,7 @@ Aqui está a tabela com os dados de tempo:
 
 O OpenMP permite paralelizar o cálculo da soma dos elementos de um vetor de forma eficiente, resultando em uma melhoria significativa no desempenho em comparação com a versão serial. No entanto, é importante encontrar um equilíbrio ao escolher o número de threads para evitar sobrecarga e obter o máximo de desempenho possível.
 
-Com base na solicitação da atividade no Adalove seegue o [vídeo de execução e análise no youtube](www.google.com)
+Com base na solicitação da atividade no Adalove seegue o [vídeo de execução e análise no youtube](https://youtu.be/q49RcoGpB-s)
 
 ### omp_activity_week8.cpp (Semana 8)
 
@@ -296,5 +296,5 @@ Aqui está a tabela com os dados de tempo:
 
 O OpenMP permite paralelizar a busca de elementos de um vetor de forma eficiente, resultando em uma melhoria significativa no desempenho em comparação com a versão serial. No entanto, é importante encontrar um equilíbrio ao escolher o número de threads para evitar sobrecarga e obter o máximo de desempenho possível.
 
-Com base na solicitação da atividade no Adalove seegue o [vídeo de execução e análise no youtube](www.google.com)
+Com base na solicitação da atividade no Adalove seegue o [vídeo de execução e análise no youtube](https://youtu.be/LXOwAej4zh4)
 
